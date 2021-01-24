@@ -30,7 +30,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,7 +54,6 @@ public class CachingImageServiceImpl implements CachingImageService {
         this.getTokenUtil = getTokenUtil;
     }
 
-    @Scheduled(fixedDelayString = "${frequency.of.update.database}")
     @Override
     public void updateCache() {
         HttpGet request = new HttpGet(IMAGE_URL);
