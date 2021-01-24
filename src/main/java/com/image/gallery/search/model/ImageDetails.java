@@ -1,4 +1,4 @@
-package com.image.gallery.search.models;
+package com.image.gallery.search.model;
 
 import java.util.List;
 import javax.persistence.Entity;

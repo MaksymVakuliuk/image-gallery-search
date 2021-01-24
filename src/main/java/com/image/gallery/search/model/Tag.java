@@ -1,4 +1,4 @@
-package com.image.gallery.search.models;
+package com.image.gallery.search.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

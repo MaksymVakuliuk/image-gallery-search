@@ -1,6 +1,6 @@
 package com.image.gallery.search.service.impl;
 
-import com.image.gallery.search.models.ImageDetails;
+import com.image.gallery.search.model.ImageDetails;
 import com.image.gallery.search.repository.ImageDetailsRepository;
 import com.image.gallery.search.service.ImageDetailsService;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.image.gallery.search.repository;
 
-import com.image.gallery.search.models.FullSizeImage;
+import com.image.gallery.search.model.FullSizeImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

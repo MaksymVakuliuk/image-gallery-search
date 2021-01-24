@@ -1,6 +1,6 @@
 package com.image.gallery.search.dao;
 
-import com.image.gallery.search.models.ImageDetails;
+import com.image.gallery.search.model.ImageDetails;
 import org.springframework.stereotype.Component;
 
 @Component

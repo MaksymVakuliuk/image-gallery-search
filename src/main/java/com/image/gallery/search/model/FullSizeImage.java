@@ -1,4 +1,4 @@
-package com.image.gallery.search.models;
+package com.image.gallery.search.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-public class CroppedImage {
+public class FullSizeImage {
     @Id
     private String id;
     @Lob
-    private byte[] croppedImage;
+    private byte[] fullSizeImage;
 }

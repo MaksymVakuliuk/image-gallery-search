@@ -1,7 +1,7 @@
 package com.image.gallery.search.dao;
 
-import com.image.gallery.search.models.ImageDetails;
-import com.image.gallery.search.models.Tag;
+import com.image.gallery.search.model.ImageDetails;
+import com.image.gallery.search.model.Tag;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 

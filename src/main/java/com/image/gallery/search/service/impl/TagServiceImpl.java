@@ -1,6 +1,6 @@
 package com.image.gallery.search.service.impl;
 
-import com.image.gallery.search.models.Tag;
+import com.image.gallery.search.model.Tag;
 import com.image.gallery.search.repository.TagRepository;
 import com.image.gallery.search.service.TagService;
 import java.util.List;

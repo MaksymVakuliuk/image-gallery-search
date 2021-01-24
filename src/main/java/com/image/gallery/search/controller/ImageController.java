@@ -1,10 +1,10 @@
-package com.image.gallery.search.controllers;
+package com.image.gallery.search.controller;
 
 import com.image.gallery.search.dao.ImageDetailDto;
 import com.image.gallery.search.dao.ImageDetailMapper;
 import com.image.gallery.search.dao.ImageDto;
 import com.image.gallery.search.dao.ImageMapper;
-import com.image.gallery.search.models.ImageDetails;
+import com.image.gallery.search.model.ImageDetails;
 import com.image.gallery.search.service.ImageDetailsService;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;

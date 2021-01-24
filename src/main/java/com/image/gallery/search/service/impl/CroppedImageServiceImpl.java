@@ -1,6 +1,6 @@
 package com.image.gallery.search.service.impl;
 
-import com.image.gallery.search.models.CroppedImage;
+import com.image.gallery.search.model.CroppedImage;
 import com.image.gallery.search.repository.CroppedImageRepository;
 import com.image.gallery.search.service.CroppedImageService;
 import lombok.AllArgsConstructor;

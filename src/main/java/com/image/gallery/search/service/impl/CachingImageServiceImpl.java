@@ -1,10 +1,12 @@
 package com.image.gallery.search.service.impl;
 
-import com.image.gallery.search.models.CroppedImage;
-import com.image.gallery.search.models.FullSizeImage;
-import com.image.gallery.search.models.ImageDetails;
-import com.image.gallery.search.models.Tag;
-import com.image.gallery.search.service.CashingImageService;
+import com.image.gallery.search.exseption.GetDataFromUrlException;
+import com.image.gallery.search.exseption.MyIoException;
+import com.image.gallery.search.model.CroppedImage;
+import com.image.gallery.search.model.FullSizeImage;
+import com.image.gallery.search.model.ImageDetails;
+import com.image.gallery.search.model.Tag;
+import com.image.gallery.search.service.CachingImageService;
 import com.image.gallery.search.service.CroppedImageService;
 import com.image.gallery.search.service.FullSizeImageService;
 import com.image.gallery.search.service.ImageDetailsService;
@@ -15,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +35,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CashingImageServiceImpl implements CashingImageService {
+public class CachingImageServiceImpl implements CachingImageService {
     private static final String IMAGE_URL = "http://interview.agileengine.com/images";
     private final ImageDetailsService imageDetailsService;
     private final FullSizeImageService fullSizeImageService;
@@ -41,7 +44,7 @@ public class CashingImageServiceImpl implements CashingImageService {
     private final TokenUtil getTokenUtil;
     private String token;
 
-    public CashingImageServiceImpl(ImageDetailsService imageDetailsService,
+    public CachingImageServiceImpl(ImageDetailsService imageDetailsService,
                                    FullSizeImageService fullSizeImageService,
                                    CroppedImageService croppedImageService,
                                    TagService tagService,
@@ -53,12 +56,12 @@ public class CashingImageServiceImpl implements CashingImageService {
         this.getTokenUtil = getTokenUtil;
     }
 
-    @Scheduled(fixedDelay = 300000)
+    @Scheduled(fixedDelayString = "${frequency.of.update.database}")
     @Override
-    public void updateCash() {
+    public void updateCache() {
+        System.out.println("start of cache " + LocalDateTime.now().toLocalTime().toString());
         HttpGet request = new HttpGet(IMAGE_URL);
         token = getTokenUtil.getToken();
-        System.out.println(token);
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
                 CloseableHttpResponse response = httpClient.execute(request)) {
@@ -70,8 +73,9 @@ public class CashingImageServiceImpl implements CashingImageService {
                 getImageIdFromPage(i);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new GetDataFromUrlException("Failed to cache image data.", e);
         }
+        System.out.println("end of cache " + LocalDateTime.now().toLocalTime().toString());
     }
 
     private int getImageIdFromPage(int pageNumber) {
@@ -91,9 +95,8 @@ public class CashingImageServiceImpl implements CashingImageService {
             }
             return count;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new GetDataFromUrlException("Failed to get image data from page.", e);
         }
-        return 0;
     }
 
     private ImageDetails getImageDetail(String id) {
@@ -106,9 +109,8 @@ public class CashingImageServiceImpl implements CashingImageService {
             JSONObject imageDetailsJson = new JSONObject(stringEntity);
             return getImageDetailFromJson(imageDetailsJson);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new GetDataFromUrlException("Failed to get image details.", e);
         }
-        return null;
     }
 
     private ImageDetails getImageDetailFromJson(JSONObject imageDetailsJson) {
@@ -125,8 +127,10 @@ public class CashingImageServiceImpl implements CashingImageService {
         imageDetails.setFullSizeImage(getFullSizeImage(id, fullSizePictureUrl));
         byte[] fullSizeImage = imageDetails.getFullSizeImage().getFullSizeImage();
         int[] imageResolution = getImageResolution(fullSizeImage);
-        imageDetails.setImageWidth(imageResolution[0]);
-        imageDetails.setImageHeight(imageResolution[1]);
+        if (imageResolution != null) {
+            imageDetails.setImageWidth(imageResolution[0]);
+            imageDetails.setImageHeight(imageResolution[1]);
+        }
         return imageDetailsService.save(imageDetails);
     }
 
@@ -156,9 +160,8 @@ public class CashingImageServiceImpl implements CashingImageService {
             ImageIO.write(bufferedImage, "jpg", bos);
             return bos.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new GetDataFromUrlException("Failed to get image.", e);
         }
-        return null;
     }
 
     private int[] getImageResolution(byte[] image) {
@@ -166,7 +169,7 @@ public class CashingImageServiceImpl implements CashingImageService {
         try {
             read = ImageIO.read(new ByteArrayInputStream(image));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new MyIoException("Failed convert byte[] to BufferedImage.", e);
         }
         return read != null ? new int[]{ read.getWidth(), read.getHeight()} : null;
     }

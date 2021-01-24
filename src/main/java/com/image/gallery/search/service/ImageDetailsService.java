@@ -1,6 +1,6 @@
 package com.image.gallery.search.service;
 
-import com.image.gallery.search.models.ImageDetails;
+import com.image.gallery.search.model.ImageDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
