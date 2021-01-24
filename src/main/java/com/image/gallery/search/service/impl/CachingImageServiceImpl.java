@@ -17,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,7 +58,6 @@ public class CachingImageServiceImpl implements CachingImageService {
     @Scheduled(fixedDelayString = "${frequency.of.update.database}")
     @Override
     public void updateCache() {
-        System.out.println("start of cache " + LocalDateTime.now().toLocalTime().toString());
         HttpGet request = new HttpGet(IMAGE_URL);
         token = getTokenUtil.getToken();
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -75,7 +73,6 @@ public class CachingImageServiceImpl implements CachingImageService {
         } catch (IOException e) {
             throw new GetDataFromUrlException("Failed to cache image data.", e);
         }
-        System.out.println("end of cache " + LocalDateTime.now().toLocalTime().toString());
     }
 
     private int getImageIdFromPage(int pageNumber) {
