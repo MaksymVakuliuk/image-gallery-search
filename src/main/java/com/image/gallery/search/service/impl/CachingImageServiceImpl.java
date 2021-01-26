@@ -39,31 +39,31 @@ public class CachingImageServiceImpl implements CachingImageService {
     private final FullSizeImageService fullSizeImageService;
     private final CroppedImageService croppedImageService;
     private final TagService tagService;
-    private final TokenUtil getTokenUtil;
-    private String token;
+    private final TokenUtil tokenUtil;
+    private String accessToken;
 
     public CachingImageServiceImpl(ImageDetailsService imageDetailsService,
                                    FullSizeImageService fullSizeImageService,
                                    CroppedImageService croppedImageService,
                                    TagService tagService,
-                                   TokenUtil getTokenUtil) {
+                                   TokenUtil tokenUtil) {
         this.imageDetailsService = imageDetailsService;
         this.fullSizeImageService = fullSizeImageService;
         this.croppedImageService = croppedImageService;
         this.tagService = tagService;
-        this.getTokenUtil = getTokenUtil;
+        this.tokenUtil = tokenUtil;
     }
 
     @Override
     public void updateCache() {
         HttpGet request = new HttpGet(IMAGE_URL);
-        token = getTokenUtil.getToken();
-        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        accessToken = tokenUtil.getAccessToken();
+        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
                 CloseableHttpResponse response = httpClient.execute(request)) {
-            HttpEntity httpEntity = response.getEntity();
-            String stringEntity = EntityUtils.toString(httpEntity);
-            JSONObject pageJson = new JSONObject(stringEntity);
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity);
+            JSONObject pageJson = new JSONObject(responseString);
             int pageCount = pageJson.getInt("pageCount");
             for (int i = 1; i < pageCount; i++) {
                 getImageIdFromPage(i);
@@ -76,12 +76,12 @@ public class CachingImageServiceImpl implements CachingImageService {
     private int getImageIdFromPage(int pageNumber) {
         int count = 0;
         HttpGet request = new HttpGet(IMAGE_URL + "?page=" + pageNumber);
-        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
                  CloseableHttpResponse response = httpClient.execute(request)) {
-            HttpEntity httpEntity = response.getEntity();
-            String stringEntity = EntityUtils.toString(httpEntity);
-            JSONObject pageJson = new JSONObject(stringEntity);
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity);
+            JSONObject pageJson = new JSONObject(responseString);
             JSONArray pictures = pageJson.getJSONArray("pictures");
             int length = pictures.length();
             for (int i = 0; i < length; i++) {
@@ -96,12 +96,12 @@ public class CachingImageServiceImpl implements CachingImageService {
 
     private ImageDetails getImageDetail(String id) {
         HttpGet request = new HttpGet(IMAGE_URL + "/" + id);
-        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
                  CloseableHttpResponse response = httpClient.execute(request)) {
-            HttpEntity httpEntity = response.getEntity();
-            String stringEntity = EntityUtils.toString(httpEntity);
-            JSONObject imageDetailsJson = new JSONObject(stringEntity);
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity);
+            JSONObject imageDetailsJson = new JSONObject(responseString);
             return getImageDetailFromJson(imageDetailsJson);
         } catch (IOException e) {
             throw new GetDataFromUrlException("Failed to get image details.", e);
@@ -148,8 +148,8 @@ public class CachingImageServiceImpl implements CachingImageService {
         request = new HttpGet(imageUrl.replaceAll(" ", "%20"));
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
                  CloseableHttpResponse response = httpClient.execute(request)) {
-            HttpEntity httpEntity = response.getEntity();
-            InputStream content = httpEntity.getContent();
+            HttpEntity responseEntity = response.getEntity();
+            InputStream content = responseEntity.getContent();
             BufferedImage bufferedImage = ImageIO.read(content);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ImageIO.write(bufferedImage, "jpg", bos);

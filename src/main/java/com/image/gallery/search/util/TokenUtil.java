@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class TokenUtil {
     private static final String IMAGE_URL = "http://interview.agileengine.com/images";
 
-    public String getToken() {
+    public String getAccessToken() {
         HttpPost httpPost = new HttpPost("http://interview.agileengine.com/auth");
         StringEntity postEntity = null;
         try {
@@ -35,20 +35,20 @@ public class TokenUtil {
         httpPost.setHeader("Accept", "*/*");
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
                  CloseableHttpResponse response = httpClient.execute(httpPost)) {
-            String token = getTokenFromEntity(response.getEntity());
-            return checkToken(token) ? token : null;
+            String token = getAccessTokenFromEntity(response.getEntity());
+            return checkAccessToken(token) ? token : null;
         } catch (IOException e) {
             throw new GetDataFromUrlException("Failed to get token.", e);
         }
     }
 
-    private String getTokenFromEntity(HttpEntity httpEntity) throws IOException {
+    private String getAccessTokenFromEntity(HttpEntity httpEntity) throws IOException {
         String httpEntityString = EntityUtils.toString(httpEntity);
         JSONObject jsonObject = new JSONObject(httpEntityString);
         return jsonObject.getString("token");
     }
 
-    private boolean checkToken(String token) {
+    private boolean checkAccessToken(String token) {
         HttpGet request = new HttpGet(IMAGE_URL);
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         try (CloseableHttpClient httpClient = HttpClients.createDefault();

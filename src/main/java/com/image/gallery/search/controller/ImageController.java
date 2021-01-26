@@ -26,8 +26,8 @@ public class ImageController {
     private final ImageDetailMapper imageDetailMapper;
 
     @GetMapping("/images")
-    public Page<ImageDto> getAllImage(@PageableDefault Pageable pageable,
-                                      HttpServletRequest httpServletRequest) {
+    public Page<ImageDto> getAllImages(@PageableDefault Pageable pageable,
+                                       HttpServletRequest httpServletRequest) {
         Page<ImageDetails> allImageDetail = imageDetailsService.findAll(pageable);
         return allImageDetail.map(imageDetails ->
                 imageMapper.convertToImageDto(imageDetails, httpServletRequest.getHeader("host")));
@@ -42,9 +42,9 @@ public class ImageController {
     }
 
     @GetMapping("/search/{searchTerm}")
-    public Page<ImageDto> getSearchImage(@PathVariable String searchTerm,
-                                         HttpServletRequest httpServletRequest,
-                                         Pageable pageable) {
+    public Page<ImageDto> getSearchImages(@PathVariable String searchTerm,
+                                          HttpServletRequest httpServletRequest,
+                                          Pageable pageable) {
         Page<ImageDetails> allImageDetail = imageDetailsService.search(searchTerm, pageable);
         return allImageDetail.map(imageDetails ->
                imageMapper.convertToImageDto(imageDetails, httpServletRequest.getHeader("host")));
