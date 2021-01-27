@@ -1,4 +1,4 @@
-package com.image.gallery.search.dao;
+package com.image.gallery.search.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,9 +1,9 @@
 package com.image.gallery.search.controller;
 
-import com.image.gallery.search.dao.ImageDetailDto;
-import com.image.gallery.search.dao.ImageDetailMapper;
-import com.image.gallery.search.dao.ImageDto;
-import com.image.gallery.search.dao.ImageMapper;
+import com.image.gallery.search.dto.ImageDetailsDto;
+import com.image.gallery.search.dto.ImageDetailsMapper;
+import com.image.gallery.search.dto.ImageDto;
+import com.image.gallery.search.dto.ImageMapper;
 import com.image.gallery.search.model.ImageDetails;
 import com.image.gallery.search.service.ImageDetailsService;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ImageController {
     private final ImageDetailsService imageDetailsService;
     private final ImageMapper imageMapper;
-    private final ImageDetailMapper imageDetailMapper;
+    private final ImageDetailsMapper imageDetailsMapper;
 
     @GetMapping("/images")
     public Page<ImageDto> getAllImages(@PageableDefault Pageable pageable,
@@ -34,10 +34,10 @@ public class ImageController {
     }
 
     @GetMapping("/images/{id}")
-    public ImageDetailDto getImageDetail(@PathVariable String id,
-                                         HttpServletRequest httpServletRequest) {
+    public ImageDetailsDto getImageDetail(@PathVariable String id,
+                                          HttpServletRequest httpServletRequest) {
         ImageDetails imageDetails = imageDetailsService.findById(id);
-        return imageDetailMapper
+        return imageDetailsMapper
                 .convertToImageDetailDto(imageDetails, httpServletRequest.getHeader("host"));
     }
 

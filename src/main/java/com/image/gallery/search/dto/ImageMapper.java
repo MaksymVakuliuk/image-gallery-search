@@ -1,4 +1,4 @@
-package com.image.gallery.search.dao;
+package com.image.gallery.search.dto;
 
 import com.image.gallery.search.model.ImageDetails;
 import org.springframework.stereotype.Component;
