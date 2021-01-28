@@ -4,6 +4,8 @@ import com.image.gallery.search.service.impl.CachingImageServiceImpl;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.annotation.PostConstruct;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,11 +27,13 @@ public class CachingController {
     }
 
     @GetMapping("/set-fixed-delay/{fixedDelay}")
-    public String setFixedDelay(@PathVariable Long fixedDelay) {
+    public ResponseEntity<Object> setFixedDelay(@PathVariable Long fixedDelay) {
         timer.cancel();
+        timer.purge();
         timer = new Timer();
         timer.schedule(getCachingTimerTask(), 0, fixedDelay);
-        return "Fixed delay set at " + fixedDelay + "millisecond.";
+        String responseString = "Fixed delay set at " + fixedDelay + " millisecond.";
+        return new ResponseEntity<>(responseString, HttpStatus.OK);
     }
 
     private TimerTask getCachingTimerTask() {
