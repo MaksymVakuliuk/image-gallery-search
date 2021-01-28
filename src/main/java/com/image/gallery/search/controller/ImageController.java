@@ -4,6 +4,7 @@ import com.image.gallery.search.dto.ImageDetailsDto;
 import com.image.gallery.search.dto.ImageDetailsMapper;
 import com.image.gallery.search.dto.ImageDto;
 import com.image.gallery.search.dto.ImageMapper;
+import com.image.gallery.search.exseption.NotFoundResponseException;
 import com.image.gallery.search.model.ImageDetails;
 import com.image.gallery.search.service.ImageDetailsService;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,6 @@ public class ImageController {
     public ResponseEntity<Object> getAllImages(@PageableDefault Pageable pageable,
                                                HttpServletRequest httpServletRequest) {
         Page<ImageDetails> allImageDetail = imageDetailsService.findAll(pageable);
-
         Page<ImageDto> imageDtoPage = allImageDetail.map(imageDetails ->
                 imageMapper.convertToImageDto(imageDetails, httpServletRequest.getHeader("host")));
         return new ResponseEntity<>(imageDtoPage, HttpStatus.OK);
@@ -39,10 +39,15 @@ public class ImageController {
     @GetMapping("/images/{id}")
     public ResponseEntity<Object> getImageDetail(@PathVariable String id,
                                           HttpServletRequest httpServletRequest) {
-        ImageDetails imageDetails = imageDetailsService.findById(id);
-        ImageDetailsDto imageDetailsDto = imageDetailsMapper
-                .convertToImageDetailDto(imageDetails, httpServletRequest.getHeader("host"));
-        return new ResponseEntity<>(imageDetailsDto, HttpStatus.OK);
+        try {
+            ImageDetails imageDetails = imageDetailsService.findById(id);
+            ImageDetailsDto imageDetailsDto = imageDetailsMapper
+                    .convertToImageDetailDto(imageDetails, httpServletRequest.getHeader("host"));
+            return new ResponseEntity<>(imageDetailsDto, HttpStatus.OK);
+        } catch (NullPointerException e) {
+            throw new NotFoundResponseException(
+                    "Not found image details with image's id: " + id, e);
+        }
     }
 
     @GetMapping("/search/{searchTerm}")
@@ -57,16 +62,24 @@ public class ImageController {
 
     @GetMapping("pictures/cropped/{id}")
     public ResponseEntity<Object> getCroppedImage(@PathVariable String id) {
-        ImageDetails byId = imageDetailsService.findById(id);
-        byte[] croppedImage = byId.getCroppedImage().getCroppedImage();
-        return createResponseEntityWithImage(croppedImage);
+        try {
+            ImageDetails byId = imageDetailsService.findById(id);
+            byte[] croppedImage = byId.getCroppedImage().getCroppedImage();
+            return createResponseEntityWithImage(croppedImage);
+        } catch (NullPointerException e) {
+            throw new NotFoundResponseException("Not found cropped image with id: " + id, e);
+        }
     }
 
     @GetMapping("pictures/full-size/{id}")
     public ResponseEntity<Object> getFullSizeImage(@PathVariable String id) {
-        ImageDetails byId = imageDetailsService.findById(id);
-        byte[] croppedImage = byId.getFullSizeImage().getFullSizeImage();
-        return createResponseEntityWithImage(croppedImage);
+        try {
+            ImageDetails byId = imageDetailsService.findById(id);
+            byte[] croppedImage = byId.getFullSizeImage().getFullSizeImage();
+            return createResponseEntityWithImage(croppedImage);
+        } catch (NullPointerException e) {
+            throw new NotFoundResponseException("Not found full size image with id: " + id, e);
+        }
     }
 
     private ResponseEntity<Object> createResponseEntityWithImage(byte[] image) {
